@@ -8,6 +8,7 @@ public class Customer {
     private String description;
     private int age;
     private String course;
+    private String password;
     private Timestamp dataCreated;
     private Timestamp dataUpdated;
 
@@ -19,6 +20,7 @@ public class Customer {
         this.description = description;
         this.age = age;
         this.course = course;
+        this.password = password;
         this.dataCreated = dataCreated;
         this.dataUpdated = dataUpdated;
     }
@@ -37,6 +39,9 @@ public class Customer {
 
     public String getCourse() { return course; }
     public void setCourse(String course) { this.course = course; }
+
+    private String getPassword() { return password; }
+    private void setPassword(String password) { this.password = password; }
 
     public Timestamp getDataCreated() { return dataCreated; }
     public void setDataCreated(Timestamp dataCreated) { this.dataCreated = dataCreated; }

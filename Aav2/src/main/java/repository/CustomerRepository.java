@@ -2,20 +2,21 @@ package repository;
 
 import model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+
 public class CustomerRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     public int save(Customer c) {
-        String sql = "INSERT INTO customer (name, description, age, course, data_created, data_updated) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO customer (name, description, age, course,password, data_created, data_updated) VALUES (?, ?, ?, ?, ?, ?)";
         Timestamp now = new Timestamp(System.currentTimeMillis());
         return jdbcTemplate.update(sql, c.getName(), c.getDescription(), c.getAge(), c.getCourse(), now, now);
     }
