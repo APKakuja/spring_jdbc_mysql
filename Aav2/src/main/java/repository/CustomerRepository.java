@@ -3,12 +3,10 @@ package repository;
 import model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CustomerRepository {
@@ -16,30 +14,38 @@ public class CustomerRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // RowMapper para convertir ResultSet a Customer
-    private static class CustomerRowMapper implements RowMapper<Customer> {
-        @Override
-        public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new Customer(
-                    rs.getLong("id"),
-                    rs.getString("name"),
-                    rs.getString("email"),
-                    rs.getInt("age"),
-                    rs.getString("cicle"),
-                    rs.getInt("year_val")
-            );
-        }
+    public int save(Customer c) {
+        String sql = "INSERT INTO customer (name, description, age, course, data_created, data_updated) VALUES (?, ?, ?, ?, ?, ?)";
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        return jdbcTemplate.update(sql, c.getName(), c.getDescription(), c.getAge(), c.getCourse(), now, now);
     }
 
-    // Crear tabla
-    public void createTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS customer (" +
-                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
-                "name VARCHAR(255)," +
-                "email VARCHAR(255)," +
-                "age INT," +
-                "cicle VARCHAR(50)," +
-                "year_val INT)"; // <-- usa year_val
-        jdbcTemplate.execute(sql);
+    public List<Customer> findAll() {
+        String sql = "SELECT * FROM customer";
+        return jdbcTemplate.query(sql, new CustomerRowMapper());
+    }
+
+    public Optional<Customer> findById(Long id) {
+        String sql = "SELECT * FROM customer WHERE id = ?";
+        List<Customer> list = jdbcTemplate.query(sql, new Object[]{id}, new CustomerRowMapper());
+        if (list.isEmpty()) return Optional.empty();
+        return Optional.of(list.get(0));
+    }
+
+    public int updateFull(Long id, Customer c) {
+        String sql = "UPDATE customer SET name=?, description=?, age=?, course=?, data_updated=? WHERE id=?";
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        return jdbcTemplate.update(sql, c.getName(), c.getDescription(), c.getAge(), c.getCourse(), now, id);
+    }
+
+    public int updatePartial(Long id, String name, Integer age) {
+        String sql = "UPDATE customer SET name=?, age=?, data_updated=? WHERE id=?";
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        return jdbcTemplate.update(sql, name, age, now, id);
+    }
+
+    public int deleteById(Long id) {
+        String sql = "DELETE FROM customer WHERE id=?";
+        return jdbcTemplate.update(sql, id);
     }
 }
