@@ -33,22 +33,25 @@ public class CustomerController {
 
 
     @GetMapping
+    // Retorna tots els usuaris i retornar null si no troba cap usuari
     public ResponseEntity<List<Customer>> getAll() {
         List<Customer> list = repo.findAll();
-        if (list.isEmpty()) return ResponseEntity.ok(null); // seguint l'enunciat: retornar null si no troba cap usuari
+        if (list.isEmpty()) return ResponseEntity.ok(null);
         return ResponseEntity.ok(list);
     }
 
 
     @GetMapping("/{id}")
+    // retorna usuari identificat per id i retorna null si no existeix
     public ResponseEntity<Customer> getById(@PathVariable Long id) {
         return repo.findById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.ok(null)); // retornar null si no existeix (segons enunciat)
+                .orElse(ResponseEntity.ok(null));
     }
 
 
     @PutMapping("/{id}")
+    // Fa un update complet de un usuari seleccionat amb el ID
     public ResponseEntity<Customer> updateFull(@PathVariable Long id, @RequestBody Customer updated) {
         if (repo.findById(id).isEmpty())
             return ResponseEntity.status(404).build();
@@ -58,6 +61,7 @@ public class CustomerController {
 
 
     @PatchMapping("/{id}/age")
+    // Fa un update parcial a un usuari seleccionat amb el ID als camps que volguem
     public ResponseEntity<Customer> updateAge(@PathVariable Long id, @RequestParam(required = false) String name, @RequestParam Integer age) {
         if (repo.findById(id).isEmpty()) return ResponseEntity.status(404).build();
         String newName = name != null ? name : repo.findById(id).get().getName();
@@ -67,6 +71,7 @@ public class CustomerController {
 
 
     @DeleteMapping("/{id}")
+    // Esborra usuari seleccionat amb el ID
     public ResponseEntity<String> deleteById(@PathVariable Long id) {
         if (repo.findById(id).isEmpty())
             return ResponseEntity.status(404).body("No s'ha trobat el customer amb id " + id);
