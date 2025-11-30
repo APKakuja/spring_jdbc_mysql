@@ -1,0 +1,26 @@
+{
+  "data": {
+    "count": 3,
+    "control": "OK",
+    "users": [
+      {
+        "name": "Adrian",
+        "description": "Estudiant DAM",
+        "email": "adrian@example.com",
+        "password": "123456"
+      },
+      {
+        "name": "Lucia",
+        "description": "Apasionada de la IA",
+        "email": "lucia@example.com",
+        "password": "pass123"
+      },
+      {
+        "name": "Carlos",
+        "description": "Backend Developer",
+        "email": "carlos@example.com",
+        "password": "securepass"
+      }
+    ]
+  }
+}

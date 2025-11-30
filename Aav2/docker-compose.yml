@@ -2,16 +2,26 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:8.3
-    container_name: ra2_mysql2
+    image: mysql:8.0
+    container_name: ra2_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ra2_db
+      MYSQL_USER: ra2
+      MYSQL_PASSWORD: ra2
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
 
-volumes:
-  mysql_data:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma-ra2
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"

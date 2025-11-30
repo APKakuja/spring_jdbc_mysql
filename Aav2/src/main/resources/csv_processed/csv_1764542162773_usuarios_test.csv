@@ -1,0 +1,11 @@
+name,description,age,course,email,password
+Adrian,Estudiant DAM,22,DAM2,adrian@example.com,123456
+Lucia,Apasionada de la IA,25,DAM2,lucia@example.com,pass123
+Carlos,Backend Developer,30,DAM2,carlos@example.com,securepass
+Marta,Frontend fan,28,DAM2,marta@example.com,htmlcss
+Joan,Amant del codi,21,DAM2,joan@example.com,joanpass
+Nerea,Data Analyst,27,DAM2,nerea@example.com,data123
+Pau,DevOps lover,32,DAM2,pau@example.com,infra22
+Laia,UX Designer,26,DAM2,laia@example.com,uxpass
+Marc,Mobile dev,24,DAM2,marc@example.com,androidios
+Sofia,QA tester,29,DAM2,sofia@example.com,testme
