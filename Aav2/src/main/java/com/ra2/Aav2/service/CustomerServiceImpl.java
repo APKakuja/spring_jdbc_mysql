@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ra2.Aav2.model.Customer;
 import com.ra2.Aav2.repository.CustomerRepository;
+import com.ra2.Aav2.logging.CustomLogging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -33,13 +31,14 @@ public class CustomerServiceImpl implements CustomerService {
             Files.createDirectories(csvProcessed);
             Files.createDirectories(jsonProcessed);
         } catch (IOException e) {
-            // Si falla la creació de carpetes
+            CustomLogging.error("CustomerServiceImpl", "constructor", "Error creant carpetes: " + e.getMessage());
         }
     }
 
     @Override
     public void validateCustomerForSave(Customer c) throws IllegalArgumentException {
         if (c.getName() == null || c.getName().trim().length() < 3) {
+            CustomLogging.error("CustomerServiceImpl", "validateCustomerForSave", "Nom invàlid: " + c.getName());
             throw new IllegalArgumentException("El nom ha de tenir almenys 3 caràcters.");
         }
     }
@@ -51,7 +50,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ResponseEntity<?> saveUserImage(Long userId, MultipartFile imageFile) throws IOException {
+        CustomLogging.info("CustomerServiceImpl", "saveUserImage", "Accés a endpoint amb userId=" + userId);
+
         if (imageFile == null || imageFile.isEmpty()) {
+            CustomLogging.error("CustomerServiceImpl", "saveUserImage", "Fitxer buit o no proporcionat");
             return ResponseEntity.badRequest().body("No s'ha subministrat cap fitxer o està buit.");
         }
 
@@ -59,49 +61,54 @@ public class CustomerServiceImpl implements CustomerService {
         if (original == null) original = "image";
         String lower = original.toLowerCase();
         if (!(lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png"))) {
+            CustomLogging.error("CustomerServiceImpl", "saveUserImage", "Format no suportat: " + lower);
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("Només s'admeten imatges JPG/PNG.");
         }
 
-        // Comprovar existència usuari
         if (!existsById(userId)) {
+            CustomLogging.error("CustomerServiceImpl", "saveUserImage", "Usuari no trobat amb id=" + userId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuari amb id " + userId + " no trobat.");
         }
 
-        // Crear nom únic: userId_timestamp_original
         String filename = "user_" + userId + "_" + Instant.now().toEpochMilli() + "_" + original.replaceAll("\\s+", "_");
         Path dest = imagesBase.resolve(filename);
 
-        // Guardar fitxer amb NIO2
         try (InputStream is = imageFile.getInputStream()) {
             Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            CustomLogging.error("CustomerServiceImpl", "saveUserImage", "Error desant imatge: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en desar la imatge: " + e.getMessage());
         }
 
         String storedPath = "/public/images/" + filename;
         int updated = repo.updateImagePath(userId, storedPath);
         if (updated <= 0) {
+            CustomLogging.error("CustomerServiceImpl", "saveUserImage", "No s'ha pogut actualitzar la ruta a la BD per id=" + userId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No s'ha pogut actualitzar la ruta a la BD.");
         }
 
+        CustomLogging.info("CustomerServiceImpl", "saveUserImage", "Imatge guardada correctament per usuari id=" + userId);
         return ResponseEntity.ok(storedPath);
     }
 
     @Override
     public ResponseEntity<?> uploadCsv(MultipartFile csvFile) throws IOException {
+        CustomLogging.info("CustomerServiceImpl", "uploadCsv", "Procés de càrrega CSV iniciat");
+
         if (csvFile == null || csvFile.isEmpty()) {
+            CustomLogging.error("CustomerServiceImpl", "uploadCsv", "Fitxer CSV buit o no proporcionat");
             return ResponseEntity.badRequest().body("Fitxer CSV buit o no proporcionat.");
         }
 
         int inserted = 0;
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(csvFile.getInputStream()))) {
-            String header = br.readLine(); // llegir header (pot ser null)
+            String header = br.readLine();
             String line;
             while ((line = br.readLine()) != null) {
-
                 String[] parts = line.split(",", -1);
-                if (parts.length < 6) continue; // saltar línies mal formades
+                if (parts.length < 6) continue;
+
                 Customer c = new Customer();
                 c.setName(parts[0].trim());
                 c.setDescription(parts[1].trim());
@@ -116,28 +123,33 @@ public class CustomerServiceImpl implements CustomerService {
                     repo.save(c);
                     inserted++;
                 } catch (IllegalArgumentException ex) {
-                    // si falla validació, saltem el registre
+                    CustomLogging.error("CustomerServiceImpl", "uploadCsv", "Error validant registre: " + ex.getMessage());
                 }
             }
         } catch (IOException e) {
+            CustomLogging.error("CustomerServiceImpl", "uploadCsv", "Error llegint CSV: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error llegint CSV: " + e.getMessage());
         }
 
-        // Desar el fitxer original a csv_processed amb un nom únic
         String fileName = "csv_" + Instant.now().toEpochMilli() + "_" + (csvFile.getOriginalFilename() == null ? "upload.csv" : csvFile.getOriginalFilename());
         Path dest = csvProcessed.resolve(fileName);
         try (InputStream is = csvFile.getInputStream()) {
             Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            CustomLogging.error("CustomerServiceImpl", "uploadCsv", "Error guardant fitxer processat: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Insertats: " + inserted + ". Error guardant fitxer: " + e.getMessage());
         }
 
+        CustomLogging.info("CustomerServiceImpl", "uploadCsv", "Procés finalitzat. Registres afegits=" + inserted);
         return ResponseEntity.ok("Registres afegits: " + inserted);
     }
 
     @Override
     public ResponseEntity<?> uploadJson(MultipartFile jsonFile) throws IOException {
+        CustomLogging.info("CustomerServiceImpl", "uploadJson", "Procés de càrrega JSON iniciat");
+
         if (jsonFile == null || jsonFile.isEmpty()) {
+            CustomLogging.error("CustomerServiceImpl", "uploadJson", "Fitxer JSON buit o no proporcionat");
             return ResponseEntity.badRequest().body("Fitxer JSON buit o no proporcionat.");
         }
 
@@ -147,11 +159,13 @@ public class CustomerServiceImpl implements CustomerService {
         try (InputStream is = jsonFile.getInputStream()) {
             root = mapper.readTree(is);
         } catch (IOException e) {
+            CustomLogging.error("CustomerServiceImpl", "uploadJson", "JSON invàlid: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JSON invàlid: " + e.getMessage());
         }
 
         JsonNode usersNode = root.path("data").path("users");
         if (!usersNode.isArray()) {
+            CustomLogging.error("CustomerServiceImpl", "uploadJson", "Format JSON incorrecte: falta data.users");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JSON no té el format esperat (data.users array).");
         }
 
@@ -161,25 +175,25 @@ public class CustomerServiceImpl implements CustomerService {
             c.setDescription(u.path("description").asText(""));
             c.setEmail(u.path("email").asText(""));
             c.setPassword(u.path("password").asText(""));
-            // edat/curso no proporcionats en JSON; deixar null o posar valors per defecte
             try {
                 validateCustomerForSave(c);
                 repo.save(c);
                 inserted++;
             } catch (IllegalArgumentException ex) {
-                // saltar
+                CustomLogging.error("CustomerServiceImpl", "uploadJson", "Error validant registre: " + ex.getMessage());
             }
         }
 
-        // Desar el fitxer original a json_processed
         String fileName = "json_" + Instant.now().toEpochMilli() + "_" + (jsonFile.getOriginalFilename() == null ? "upload.json" : jsonFile.getOriginalFilename());
         Path dest = jsonProcessed.resolve(fileName);
         try (InputStream is = jsonFile.getInputStream()) {
             Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            CustomLogging.error("CustomerServiceImpl", "uploadJson", "Error guardant fitxer processat: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Insertats: " + inserted + ". Error guardant fitxer JSON: " + e.getMessage());
         }
 
+        CustomLogging.info("CustomerServiceImpl", "uploadJson", "Procés finalitzat. Registres afegits=" + inserted);
         return ResponseEntity.ok("Registres afegits: " + inserted);
     }
 }
