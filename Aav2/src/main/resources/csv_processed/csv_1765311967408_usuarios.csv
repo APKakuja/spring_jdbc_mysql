@@ -1,0 +1,7 @@
+name,description,age,course,email,password,imagePath,dataCreated,dataUpdated
+Sergio López,Especialista en ciberseguretat,29,DAM2,sergio.lopez@example.com,segur123,/public/images/user_9.jpg,2025-12-01T10:00:00.000+00:00,2025-12-01T10:15:00.000+00:00
+Ana Torres,Apasionada del machine learning,26,DAM2,ana.torres@example.com,mlpass,/public/images/user_10.jpg,2025-12-01T10:05:00.000+00:00,2025-12-01T10:20:00.000+00:00
+David Martín,Administrador de bases de dades,34,DAM2,david.martin@example.com,dbadmin,/public/images/user_11.jpg,2025-12-01T10:10:00.000+00:00,2025-12-01T10:25:00.000+00:00
+Elena García,Dissenyadora d’interfícies,27,DAM2,elena.garcia@example.com,uxdesign,/public/images/user_12.jpg,2025-12-01T10:12:00.000+00:00,2025-12-01T10:27:00.000+00:00
+Javier Ruiz,Enginyer de software,31,DAM2,javier.ruiz@example.com,softeng,/public/images/user_13.jpg,2025-12-01T10:15:00.000+00:00,2025-12-01T10:30:00.000+00:00
+

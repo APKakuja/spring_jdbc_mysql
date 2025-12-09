@@ -96,7 +96,7 @@ public class CustomerController {
     }
 
     // Endpoint per pujar imatge
-    @PostMapping("/{user_id}/image")
+    @PostMapping(path = "/{user_id}/image", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadImage(@PathVariable("user_id") Long userId,
                                          @RequestParam("imageFile") MultipartFile imageFile) {
         CustomLogging.info("CustomerController", "uploadImage", "Accés a endpoint per pujar imatge a usuari id=" + userId);
@@ -109,7 +109,7 @@ public class CustomerController {
     }
 
     // Upload CSV massiu
-    @PostMapping("/upload-csv")
+    @PostMapping(path = "/upload-csv", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCsv(@RequestParam("csvFile") MultipartFile csvFile) {
         CustomLogging.info("CustomerController", "uploadCsv", "Accés a endpoint per càrrega CSV");
         try {
@@ -121,7 +121,7 @@ public class CustomerController {
     }
 
     // Upload JSON massiu
-    @PostMapping("/upload-json")
+    @PostMapping(path = "/upload-json", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadJson(@RequestParam("jsonFile") MultipartFile jsonFile) {
         CustomLogging.info("CustomerController", "uploadJson", "Accés a endpoint per càrrega JSON");
         try {

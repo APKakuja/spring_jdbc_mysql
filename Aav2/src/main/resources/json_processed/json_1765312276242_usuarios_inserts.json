@@ -1,0 +1,61 @@
+{
+  "data": {
+    "users": [
+      {
+        "name": "Beatriz Molina",
+        "description": "Especialista en testing automatitzat",
+        "age": 29,
+        "course": "DAM2",
+        "email": "beatriz.molina@example.com",
+        "password": "testauto",
+        "imagePath": "/public/images/user_14.jpg",
+        "dataCreated": "2025-12-01T11:00:00.000+00:00",
+        "dataUpdated": "2025-12-01T11:15:00.000+00:00"
+      },
+      {
+        "name": "Ignacio Herrera",
+        "description": "Apasionat del desenvolupament mòbil",
+        "age": 24,
+        "course": "DAM2",
+        "email": "ignacio.herrera@example.com",
+        "password": "androiddev",
+        "imagePath": "/public/images/user_15.jpg",
+        "dataCreated": "2025-12-01T11:05:00.000+00:00",
+        "dataUpdated": "2025-12-01T11:20:00.000+00:00"
+      },
+      {
+        "name": "Patricia Sánchez",
+        "description": "Consultora en seguretat informàtica",
+        "age": 33,
+        "course": "DAM2",
+        "email": "patricia.sanchez@example.com",
+        "password": "secure33",
+        "imagePath": "/public/images/user_16.jpg",
+        "dataCreated": "2025-12-01T11:10:00.000+00:00",
+        "dataUpdated": "2025-12-01T11:25:00.000+00:00"
+      },
+      {
+        "name": "Roberto Fernández",
+        "description": "Expert en DevOps i CI/CD",
+        "age": 36,
+        "course": "DAM2",
+        "email": "roberto.fernandez@example.com",
+        "password": "cicd36",
+        "imagePath": "/public/images/user_17.jpg",
+        "dataCreated": "2025-12-01T11:12:00.000+00:00",
+        "dataUpdated": "2025-12-01T11:27:00.000+00:00"
+      },
+      {
+        "name": "Sonia Navarro",
+        "description": "Dissenyadora gràfica i UI",
+        "age": 27,
+        "course": "DAM2",
+        "email": "sonia.navarro@example.com",
+        "password": "design27",
+        "imagePath": "/public/images/user_18.jpg",
+        "dataCreated": "2025-12-01T11:15:00.000+00:00",
+        "dataUpdated": "2025-12-01T11:30:00.000+00:00"
+      }
+    ]
+  }
+}
